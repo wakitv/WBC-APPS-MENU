@@ -6,7 +6,10 @@ const urlsToCache = [
   './style.css',
   './links.json',
   './manifest.json',
-  './images/coh-icon.png'
+  './images/wbc-logo.png',
+  './images/coh-icon.png',
+  './images/chips-icon.png',
+  './images/cfr-icon.png'
 ];
 
 // Install event - cache assets
