@@ -1,0 +1,42 @@
+{
+  "apps": [
+    {
+      "id": "coh",
+      "name": "WBC COH Tracker",
+      "description": "Track and monitor your Cash on Hand data with real-time updates and detailed analytics dashboard.",
+      "url": "https://wakitv.github.io/wbc-coh-tracker/",
+      "icon": "images/coh-icon.png",
+      "badge": "Finance",
+      "color": "#d4af37",
+      "colorDark": "#b8972f",
+      "colorRgb": "212, 175, 55"
+    },
+    {
+      "id": "cfr",
+      "name": "CFR Report System",
+      "description": "Comprehensive CFR reporting system for generating and managing financial reports efficiently.",
+      "url": "https://wakitv.github.io/CFR-REPORT-SYSTEM/",
+      "icon": "📋",
+      "badge": "Reports",
+      "color": "#ef4444",
+      "colorDark": "#dc2626",
+      "colorRgb": "239, 68, 68"
+    },
+    {
+      "id": "chips",
+      "name": "Chips Income Tracker",
+      "description": "Track chips income with advanced features for monitoring earnings and generating detailed reports.",
+      "url": "https://wakitv.github.io/CHIPS-Income-Tracker-v2/",
+      "icon": "💰",
+      "badge": "Income",
+      "color": "#22c55e",
+      "colorDark": "#16a34a",
+      "colorRgb": "34, 197, 94"
+    }
+  ],
+  "meta": {
+    "title": "WBC Suite",
+    "version": "1.0.0",
+    "author": "WBC Team"
+  }
+}
