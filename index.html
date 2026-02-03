@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0a0a1a">
+    <meta name="description" content="WBC Suite - All your business tools in one place">
+    
+    <!-- PWA Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="WBC Suite">
+    <link rel="apple-touch-icon" href="images/coh-icon.png">
+    
+    <!-- Manifest -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+    
+    <title>WBC Suite</title>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="logo">
+            <img src="images/coh-icon.png" alt="WBC" class="logo-icon">
+            <span class="logo-text">WBC <span>Suite</span></span>
+        </div>
+        <div class="header-actions">
+            <button class="btn btn-install hidden" id="installBtn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="7,10 12,15 17,10"/>
+                    <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                <span>Install</span>
+            </button>
+            <button class="btn" id="refreshBtn" disabled>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M23 4v6h-6M1 20v-6h6"/>
+                    <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+                </svg>
+                <span>Refresh</span>
+            </button>
+            <button class="btn btn-primary" id="homeBtn" disabled>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                    <polyline points="9,22 9,12 15,12 15,22"/>
+                </svg>
+                <span>Home</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Menu View -->
+        <div class="menu-view" id="menuView">
+            <div class="menu-header">
+                <h1>Application Dashboard</h1>
+                <p>Select an application to launch</p>
+            </div>
+            <div class="apps-grid" id="appsGrid">
+                <!-- Apps will be dynamically loaded here -->
+            </div>
+            <div class="footer">
+                WBC Suite © 2025 • All Applications in One Place
+            </div>
+        </div>
+
+        <!-- Browser View -->
+        <div class="browser-view" id="browserView">
+            <div class="url-bar">
+                <div class="current-app">
+                    <div class="current-app-icon" id="currentAppIcon"></div>
+                    <span class="current-app-name" id="currentAppName">App Name</span>
+                    <span class="current-app-url" id="currentAppUrl">https://...</span>
+                </div>
+            </div>
+            <div class="iframe-container">
+                <div class="loading-overlay" id="loadingOverlay">
+                    <div class="spinner"></div>
+                    <p class="loading-text">Loading application...</p>
+                </div>
+                <iframe id="appFrame" src="" allow="fullscreen" title="Application Frame"></iframe>
+            </div>
+        </div>
+    </main>
+
+    <!-- Install Prompt -->
+    <div class="install-prompt" id="installPrompt">
+        <img src="images/coh-icon.png" alt="WBC" class="install-prompt-icon">
+        <div class="install-prompt-content">
+            <h4>Install WBC Suite</h4>
+            <p>Add to home screen for quick access</p>
+        </div>
+        <div class="install-prompt-actions">
+            <button class="btn btn-install" id="installPromptBtn">Install</button>
+            <button class="btn btn-close" id="dismissPromptBtn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"/>
+                    <line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // App State
+        let apps = [];
+        let currentApp = null;
+        let deferredPrompt = null;
+
+        // DOM Elements
+        const menuView = document.getElementById('menuView');
+        const browserView = document.getElementById('browserView');
+        const appsGrid = document.getElementById('appsGrid');
+        const appFrame = document.getElementById('appFrame');
+        const homeBtn = document.getElementById('homeBtn');
+        const refreshBtn = document.getElementById('refreshBtn');
+        const installBtn = document.getElementById('installBtn');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        const currentAppIcon = document.getElementById('currentAppIcon');
+        const currentAppName = document.getElementById('currentAppName');
+        const currentAppUrl = document.getElementById('currentAppUrl');
+        const installPrompt = document.getElementById('installPrompt');
+        const installPromptBtn = document.getElementById('installPromptBtn');
+        const dismissPromptBtn = document.getElementById('dismissPromptBtn');
+
+        // Load Apps from JSON
+        async function loadApps() {
+            try {
+                const response = await fetch('links.json');
+                const data = await response.json();
+                apps = data.apps;
+                renderApps();
+            } catch (error) {
+                console.error('Failed to load apps:', error);
+                appsGrid.innerHTML = '<p style="color: var(--text-secondary); text-align: center; grid-column: 1/-1;">Failed to load applications. Please refresh the page.</p>';
+            }
+        }
+
+        // Render App Cards
+        function renderApps() {
+            appsGrid.innerHTML = apps.map(app => `
+                <div class="app-card" data-app="${app.id}" onclick="openApp('${app.id}')">
+                    <div class="app-card-header">
+                        <div class="app-icon" style="--card-accent: ${app.color}; --card-accent-dark: ${app.colorDark};">
+                            ${app.icon.startsWith('images/') 
+                                ? `<img src="${app.icon}" alt="${app.name}">` 
+                                : app.icon}
+                        </div>
+                        <div class="app-info">
+                            <h3>${app.name}</h3>
+                            <span class="app-badge">${app.badge}</span>
+                        </div>
+                    </div>
+                    <p>${app.description}</p>
+                    <span class="app-link">
+                        Open App
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M5 12h14M12 5l7 7-7 7"/>
+                        </svg>
+                    </span>
+                </div>
+            `).join('');
+        }
+
+        // Open App
+        function openApp(appId) {
+            currentApp = apps.find(a => a.id === appId);
+            if (!currentApp) return;
+
+            // Update URL bar
+            if (currentApp.icon.startsWith('images/')) {
+                currentAppIcon.innerHTML = `<img src="${currentApp.icon}" alt="${currentApp.name}">`;
+            } else {
+                currentAppIcon.innerHTML = currentApp.icon;
+            }
+            currentAppIcon.style.background = currentApp.color;
+            currentAppName.textContent = currentApp.name;
+            currentAppUrl.textContent = currentApp.url;
+
+            // Show loading
+            loadingOverlay.classList.remove('hidden');
+
+            // Switch views
+            menuView.classList.add('hidden');
+            browserView.classList.add('active');
+
+            // Enable nav buttons
+            homeBtn.disabled = false;
+            refreshBtn.disabled = false;
+
+            // Load app
+            appFrame.src = currentApp.url;
+            appFrame.onload = () => loadingOverlay.classList.add('hidden');
+        }
+
+        // Go Home
+        function goHome() {
+            currentApp = null;
+            appFrame.src = '';
+            browserView.classList.remove('active');
+            menuView.classList.remove('hidden');
+            homeBtn.disabled = true;
+            refreshBtn.disabled = true;
+        }
+
+        // Refresh App
+        function refreshApp() {
+            if (currentApp) {
+                loadingOverlay.classList.remove('hidden');
+                appFrame.src = appFrame.src;
+            }
+        }
+
+        // PWA Install
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            installBtn.classList.remove('hidden');
+            
+            // Show install prompt after delay
+            setTimeout(() => {
+                if (deferredPrompt) {
+                    installPrompt.classList.add('show');
+                }
+            }, 3000);
+        });
+
+        async function installPWA() {
+            if (!deferredPrompt) return;
+            
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            
+            if (outcome === 'accepted') {
+                console.log('PWA installed');
+            }
+            
+            deferredPrompt = null;
+            installBtn.classList.add('hidden');
+            installPrompt.classList.remove('show');
+        }
+
+        function dismissInstallPrompt() {
+            installPrompt.classList.remove('show');
+        }
+
+        window.addEventListener('appinstalled', () => {
+            installBtn.classList.add('hidden');
+            installPrompt.classList.remove('show');
+            deferredPrompt = null;
+        });
+
+        // Register Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('service-worker.js')
+                    .then(reg => console.log('Service Worker registered'))
+                    .catch(err => console.log('Service Worker registration failed:', err));
+            });
+        }
+
+        // Event Listeners
+        homeBtn.addEventListener('click', goHome);
+        refreshBtn.addEventListener('click', refreshApp);
+        installBtn.addEventListener('click', installPWA);
+        installPromptBtn.addEventListener('click', installPWA);
+        dismissPromptBtn.addEventListener('click', dismissInstallPrompt);
+
+        // Keyboard Shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && currentApp) goHome();
+            if (e.key === 'F5' && currentApp) {
+                e.preventDefault();
+                refreshApp();
+            }
+        });
+
+        // Initialize
+        loadApps();
+    </script>
+</body>
+</html>
