@@ -338,8 +338,11 @@ body {
 /* Browser View */
 .browser-view {
     display: none;
-    height: calc(100vh - 68px);
-    padding-top: 68px;
+    position: fixed;
+    top: 68px;
+    left: 0;
+    right: 0;
+    bottom: 0;
 }
 
 .browser-view.active {
