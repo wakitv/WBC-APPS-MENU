@@ -346,58 +346,10 @@ body {
     display: block;
 }
 
-.url-bar {
-    background: var(--bg-secondary);
-    padding: 12px 24px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    border-bottom: 1px solid var(--border-color);
-}
-
-.current-app {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    flex: 1;
-}
-
-.current-app-icon {
-    width: 28px;
-    height: 28px;
-    border-radius: 6px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-    overflow: hidden;
-}
-
-.current-app-icon img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.current-app-name {
-    font-weight: 500;
-    font-size: 14px;
-}
-
-.current-app-url {
-    color: var(--text-muted);
-    font-size: 12px;
-    margin-left: auto;
-    font-family: 'SF Mono', Monaco, 'Courier New', monospace;
-    background: rgba(255, 255, 255, 0.05);
-    padding: 4px 10px;
-    border-radius: 4px;
-}
-
 /* Iframe Container */
 .iframe-container {
     width: 100%;
-    height: calc(100vh - 68px - 53px);
+    height: 100%;
     position: relative;
     background: #fff;
 }
@@ -554,10 +506,6 @@ body {
 
     .app-card {
         padding: 20px;
-    }
-
-    .current-app-url {
-        display: none;
     }
 
     .install-prompt {
