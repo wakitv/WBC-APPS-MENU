@@ -24,8 +24,8 @@
     <!-- Header -->
     <header class="header">
         <div class="logo">
-            <img src="images/wbc-logo.png" alt="WBC" class="logo-icon">
-            <span class="logo-text">WBC <span>Suite</span></span>
+            <img src="images/wbc-logo.png" alt="WBC" class="logo-icon" id="headerIcon">
+            <span class="logo-text" id="headerTitle">WBC <span>Suite</span></span>
         </div>
         <div class="header-actions">
             <button class="btn btn-install hidden" id="installBtn">
@@ -71,13 +71,6 @@
 
         <!-- Browser View -->
         <div class="browser-view" id="browserView">
-            <div class="url-bar">
-                <div class="current-app">
-                    <div class="current-app-icon" id="currentAppIcon"></div>
-                    <span class="current-app-name" id="currentAppName">App Name</span>
-                    <span class="current-app-url" id="currentAppUrl">https://...</span>
-                </div>
-            </div>
             <div class="iframe-container">
                 <div class="loading-overlay" id="loadingOverlay">
                     <div class="spinner"></div>
@@ -121,9 +114,8 @@
         const refreshBtn = document.getElementById('refreshBtn');
         const installBtn = document.getElementById('installBtn');
         const loadingOverlay = document.getElementById('loadingOverlay');
-        const currentAppIcon = document.getElementById('currentAppIcon');
-        const currentAppName = document.getElementById('currentAppName');
-        const currentAppUrl = document.getElementById('currentAppUrl');
+        const headerIcon = document.getElementById('headerIcon');
+        const headerTitle = document.getElementById('headerTitle');
         const installPrompt = document.getElementById('installPrompt');
         const installPromptBtn = document.getElementById('installPromptBtn');
         const dismissPromptBtn = document.getElementById('dismissPromptBtn');
@@ -172,15 +164,9 @@
             currentApp = apps.find(a => a.id === appId);
             if (!currentApp) return;
 
-            // Update URL bar
-            if (currentApp.icon.startsWith('images/')) {
-                currentAppIcon.innerHTML = `<img src="${currentApp.icon}" alt="${currentApp.name}">`;
-            } else {
-                currentAppIcon.innerHTML = currentApp.icon;
-            }
-            currentAppIcon.style.background = currentApp.color;
-            currentAppName.textContent = currentApp.name;
-            currentAppUrl.textContent = currentApp.url;
+            // Update header with app info
+            headerIcon.src = currentApp.icon;
+            headerTitle.innerHTML = currentApp.name;
 
             // Show loading
             loadingOverlay.classList.remove('hidden');
@@ -202,6 +188,11 @@
         function goHome() {
             currentApp = null;
             appFrame.src = '';
+            
+            // Reset header to WBC Suite
+            headerIcon.src = 'images/wbc-logo.png';
+            headerTitle.innerHTML = 'WBC <span>Suite</span>';
+            
             browserView.classList.remove('active');
             menuView.classList.remove('hidden');
             homeBtn.disabled = true;
