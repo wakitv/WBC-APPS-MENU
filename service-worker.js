@@ -9,7 +9,8 @@ const urlsToCache = [
   './images/wbc-logo.png',
   './images/coh-icon.png',
   './images/chips-icon.png',
-  './images/cfr-icon.png'
+  './images/cfr-icon.png',
+  './images/duty-icon.png'
 ];
 
 // Install event - cache assets
