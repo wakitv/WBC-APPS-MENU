@@ -329,6 +329,12 @@ body {
     --card-accent-rgb: 34, 197, 94;
 }
 
+.app-card[data-app="duty"] {
+    --card-accent: #8b5cf6;
+    --card-accent-dark: #7c3aed;
+    --card-accent-rgb: 139, 92, 246;
+}
+
 /* Browser View */
 .browser-view {
     display: none;
