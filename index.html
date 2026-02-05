@@ -27,6 +27,12 @@
             <img src="images/wbc-logo.png" alt="WBC" class="logo-icon" id="headerIcon">
             <span class="logo-text" id="headerTitle">WBC <span>Suite</span></span>
         </div>
+        
+        <!-- App Widgets (shown when in browser view) -->
+        <div class="app-widgets hidden" id="appWidgets">
+            <!-- Will be populated dynamically -->
+        </div>
+        
         <div class="header-actions">
             <button class="btn btn-install hidden" id="installBtn">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -65,7 +71,7 @@
                 <!-- Apps will be dynamically loaded here -->
             </div>
             <div class="footer">
-                WBC Suite © 2025 • All Applications in One Place
+                WBC Suite © 2026 • All Applications in One Place
             </div>
         </div>
 
@@ -119,6 +125,14 @@
         const installPrompt = document.getElementById('installPrompt');
         const installPromptBtn = document.getElementById('installPromptBtn');
         const dismissPromptBtn = document.getElementById('dismissPromptBtn');
+        const appWidgets = document.getElementById('appWidgets');
+        const logoContainer = document.querySelector('.logo');
+
+        // Detect mobile/tablet devices
+        function isMobileDevice() {
+            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+                   (navigator.maxTouchPoints && navigator.maxTouchPoints > 2);
+        }
 
         // Load Apps from JSON
         async function loadApps() {
@@ -127,6 +141,7 @@
                 const data = await response.json();
                 apps = data.apps;
                 renderApps();
+                renderAppWidgets();
             } catch (error) {
                 console.error('Failed to load apps:', error);
                 appsGrid.innerHTML = '<p style="color: var(--text-secondary); text-align: center; grid-column: 1/-1;">Failed to load applications. Please refresh the page.</p>';
@@ -159,14 +174,39 @@
             `).join('');
         }
 
+        // Render App Widgets in Header
+        function renderAppWidgets() {
+            appWidgets.innerHTML = apps.map(app => `
+                <div class="app-widget ${currentApp && currentApp.id === app.id ? 'active' : ''}" 
+                     data-app="${app.id}" 
+                     onclick="openApp('${app.id}')"
+                     title="${app.name}"
+                     style="--widget-color: ${app.color}; --widget-color-rgb: ${app.colorRgb};">
+                    <img src="${app.icon}" alt="${app.name}">
+                    <span class="widget-label">${app.badge}</span>
+                </div>
+            `).join('');
+        }
+
+        // Update active widget
+        function updateActiveWidget() {
+            document.querySelectorAll('.app-widget').forEach(widget => {
+                widget.classList.remove('active');
+                if (currentApp && widget.dataset.app === currentApp.id) {
+                    widget.classList.add('active');
+                }
+            });
+        }
+
         // Open App
         function openApp(appId) {
             currentApp = apps.find(a => a.id === appId);
             if (!currentApp) return;
 
-            // Update header with app info
-            headerIcon.src = currentApp.icon;
-            headerTitle.innerHTML = currentApp.name;
+            // Hide logo, show app widgets
+            logoContainer.classList.add('hidden');
+            appWidgets.classList.remove('hidden');
+            updateActiveWidget();
 
             // Show loading
             loadingOverlay.classList.remove('hidden');
@@ -189,9 +229,9 @@
             currentApp = null;
             appFrame.src = '';
             
-            // Reset header to WBC Suite
-            headerIcon.src = 'images/wbc-logo.png';
-            headerTitle.innerHTML = 'WBC <span>Suite</span>';
+            // Show logo, hide app widgets
+            logoContainer.classList.remove('hidden');
+            appWidgets.classList.add('hidden');
             
             browserView.classList.remove('active');
             menuView.classList.remove('hidden');
@@ -207,18 +247,22 @@
             }
         }
 
-        // PWA Install
+        // PWA Install - Only show on desktop
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
-            installBtn.classList.remove('hidden');
             
-            // Show install prompt after delay
-            setTimeout(() => {
-                if (deferredPrompt) {
-                    installPrompt.classList.add('show');
-                }
-            }, 3000);
+            // Only show install button on non-mobile devices
+            if (!isMobileDevice()) {
+                installBtn.classList.remove('hidden');
+                
+                // Show install prompt after delay (desktop only)
+                setTimeout(() => {
+                    if (deferredPrompt && !isMobileDevice()) {
+                        installPrompt.classList.add('show');
+                    }
+                }, 3000);
+            }
         });
 
         async function installPWA() {
