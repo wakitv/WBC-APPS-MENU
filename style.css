@@ -338,11 +338,8 @@ body {
 /* Browser View */
 .browser-view {
     display: none;
-    position: fixed;
-    top: 68px;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    height: calc(100vh - 68px);
+    padding-top: 68px;
 }
 
 .browser-view.active {
@@ -472,6 +469,85 @@ body {
     color: var(--text-secondary);
 }
 
+/* App Widgets in Header */
+.app-widgets {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 8px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
+}
+
+.app-widgets.hidden {
+    display: none;
+}
+
+.app-widget {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: var(--transition);
+    background: transparent;
+    border: 1px solid transparent;
+    position: relative;
+}
+
+.app-widget img {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    object-fit: cover;
+    transition: var(--transition);
+}
+
+.widget-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    transition: var(--transition);
+}
+
+.app-widget:hover {
+    background: rgba(var(--widget-color-rgb), 0.1);
+    border-color: rgba(var(--widget-color-rgb), 0.3);
+}
+
+.app-widget:hover .widget-label {
+    color: var(--widget-color);
+}
+
+.app-widget.active {
+    background: rgba(var(--widget-color-rgb), 0.15);
+    border-color: var(--widget-color);
+}
+
+.app-widget.active .widget-label {
+    color: var(--widget-color);
+    font-weight: 600;
+}
+
+.app-widget.active::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 20px;
+    height: 3px;
+    background: var(--widget-color);
+    border-radius: 2px;
+}
+
+/* Hidden class for logo */
+.logo.hidden {
+    display: none;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .header {
@@ -511,20 +587,39 @@ body {
         padding: 20px;
     }
 
+    /* Hide install prompt on mobile/tablet */
     .install-prompt {
-        left: 16px;
-        right: 16px;
-        transform: translateX(0) translateY(120px);
-        flex-wrap: wrap;
+        display: none !important;
     }
 
-    .install-prompt.show {
-        transform: translateX(0) translateY(0);
+    .btn-install {
+        display: none !important;
     }
 
-    .install-prompt-actions {
-        width: 100%;
-        justify-content: flex-end;
+    /* App widgets responsive */
+    .app-widgets {
+        gap: 4px;
+        padding: 4px 6px;
+    }
+
+    .app-widget {
+        padding: 6px 8px;
+        gap: 6px;
+    }
+
+    .app-widget img {
+        width: 24px;
+        height: 24px;
+    }
+
+    .widget-label {
+        font-size: 11px;
+    }
+
+    .app-widget.active::after {
+        bottom: -6px;
+        width: 16px;
+        height: 2px;
     }
 }
 
@@ -541,5 +636,26 @@ body {
 
     .app-info h3 {
         font-size: 15px;
+    }
+
+    /* Smaller widgets on very small screens */
+    .app-widgets {
+        gap: 2px;
+        padding: 3px 4px;
+    }
+
+    .app-widget {
+        padding: 4px 6px;
+        gap: 4px;
+    }
+
+    .app-widget img {
+        width: 22px;
+        height: 22px;
+        border-radius: 4px;
+    }
+
+    .widget-label {
+        font-size: 10px;
     }
 }
