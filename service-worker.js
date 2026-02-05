@@ -1,5 +1,5 @@
 // WBC Suite Service Worker
-const CACHE_NAME = 'wbc-suite-v1.0.0';
+const CACHE_NAME = 'wbc-suite-v1.1.0';
 const urlsToCache = [
   './',
   './index.html',
